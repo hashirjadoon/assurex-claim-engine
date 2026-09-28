@@ -1,0 +1,60 @@
+{
+  "product_category": "Appliances",
+  "coverage_duration_days_options": [
+    730,
+    1095
+  ],
+  "repair_conditions": "Repairs must be done by an authorized technician",
+  "covered_faults": [
+    "Motor Failure",
+    "Compressor Fault",
+    "Electrical Short Circuit",
+    "Thermostat Malfunction",
+    "Drainage Issue"
+  ],
+  "exclusions": [
+    "Improper Installation Damage",
+    "Power Surge Damage",
+    "Rust/Corrosion"
+  ],
+  "warranty_start_condition": "Warranty starts on the purchase date shown on the receipt",
+  "claim_reporting_period_days": 30,
+  "grace_period_days": 3,
+  "near_expiry_window_days": 7,
+  "mandatory_documents": [
+    "receipt",
+    "warranty_card",
+    "product_image"
+  ],
+  "authorized_service_required": true,
+  "unauthorized_repair_action": "manual_review",
+  "serial_mismatch_action": "hard_fail",
+  "allow_claim_after_replacement": false,
+  "max_prior_repairs": 3,
+  "replacement_conditions": "One replacement per product lifetime",
+  "ambiguous_keywords": [
+    "sometimes",
+    "occasionally",
+    "not sure",
+    "inconsistent",
+    "hard to describe"
+  ],
+  "hard_fail_rules": [
+    "Warranty expired beyond grace period",
+    "Excluded fault",
+    "Serial number mismatch",
+    "Replacement already used"
+  ],
+  "warning_rules": [
+    "Repairs exceed max_prior_repairs"
+  ],
+  "manual_review_rules": [
+    "Missing mandatory document",
+    "Unauthorized repair",
+    "Claim near expiry or in grace period",
+    "Ambiguous fault description",
+    "Duplicate claim",
+    "Fault not listed as covered",
+    "Late fault reporting"
+  ]
+}

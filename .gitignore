@@ -1,6 +1,10 @@
 venv/
+.venv/
 __pycache__/
 *.pyc
 database/*.db
 .streamlit/secrets.toml
 .ipynb_checkpoints/
+data/uploads/
+project_snapshot.txt
+project_source.txt

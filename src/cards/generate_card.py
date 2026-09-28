@@ -1,163 +1,110 @@
 """
-AssureX Claim Engine - Claim Summary Card Generator
-=====================================================
-Renders each claim record as a visual "Claim Summary Card" image using Pillow.
-
-IMPORTANT (per SRS): This card must NOT contain the Python model's prediction,
-confidence score, or final claim decision. It only shows claim information.
-
-Training claims get >=2 visual variations (different background/font/spacing/date format).
-Validation and testing claims get exactly 1 image each (no variations, no training use).
-
-Output structure:
-    data/claim_summary_cards/train/{Valid,Invalid,ManualReview}/
-    data/claim_summary_cards/val/{Valid,Invalid,ManualReview}/
-    data/claim_summary_cards/test/{Valid,Invalid,ManualReview}/
-
-Run from project root:
-    python3 src/cards/generate_card.py
+Claim Summary Card generator (v2, color-coded status blocks).
+Cards show claim information only. No prediction, confidence or decision.
+Train: 2 variations per claim. Val/test: 1 image per claim.
 """
-
 import os
 import random
+import sys
 from datetime import datetime
+from pathlib import Path
 
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
+from src.rules_engine.warranty_rules import load_policy
+
 random.seed(42)
 
-CARD_WIDTH = 600
-CARD_HEIGHT = 500
-
-BACKGROUND_COLORS = ["#FFFFFF", "#F5F5F0", "#EAF2F8"]
-FONT_SIZES = [16, 18]
-DATE_FORMATS = ["%Y-%m-%d", "%d %b %Y"]
-
-# Class label used in CSV vs folder name (SRS uses "Manual Review" in text,
-# but our CSV/folder use "ManualReview" as a single token — kept consistent
-# across dataset_generator, cards, and model training)
-LABEL_TO_FOLDER = {
-    "Valid": "Valid",
-    "Invalid": "Invalid",
-    "ManualReview": "ManualReview",
-}
+W, H = 600, 700
+GREEN, AMBER, RED = "#2E9E4F", "#F2A900", "#D93025"
+BACKGROUNDS = ["#FFFFFF", "#F1F1EC", "#E8F1F8"]
+FONT_PATHS = ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+              "/usr/share/fonts/dejavu/DejaVuSans-Bold.ttf",
+              "/usr/share/fonts/dejavu-sans-fonts/DejaVuSans-Bold.ttf"]
 
 
-def get_font(size: int):
-    """Falls back to Pillow's default font if no truetype font is found on the system."""
-    candidates = [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-        "/usr/share/fonts/dejavu/DejaVuSans.ttf",
-    ]
-    for path in candidates:
-        if os.path.exists(path):
-            return ImageFont.truetype(path, size)
+def font(size):
+    for p in FONT_PATHS:
+        if os.path.exists(p):
+            return ImageFont.truetype(p, size)
     return ImageFont.load_default()
 
 
-def format_date(date_str: str, fmt: str) -> str:
-    dt = datetime.strptime(date_str, "%Y-%m-%d")
-    return dt.strftime(fmt)
+def d(s):
+    return datetime.strptime(str(s)[:10], "%Y-%m-%d")
 
 
-def build_card_lines(row: pd.Series, date_fmt: str) -> list:
-    warranty_expiry = datetime.strptime(row["warranty_expiry_date"], "%Y-%m-%d")
-    claim_date = datetime.strptime(row["claim_submission_date"], "%Y-%m-%d")
-    days_diff = (warranty_expiry - claim_date).days
-    warranty_status = "Active" if days_diff >= 0 else "Expired"
-    warranty_detail = (
-        f"{days_diff} days remaining" if days_diff >= 0
-        else f"{abs(days_diff)} days overdue"
-    )
+def build_rows(r):
+    p = load_policy(r["product_category"])
+    rows = []
 
-    doc_status = []
-    doc_status.append(f"Receipt: {'Present' if row['has_receipt'] else 'Missing'}")
-    doc_status.append(f"Warranty Card: {'Present' if row['has_warranty_card'] else 'Missing'}")
-    doc_status.append(f"Product Image: {'Present' if row['has_product_image'] else 'Missing'}")
+    left = (d(r["warranty_expiry_date"]) - d(r["claim_submission_date"])).days
+    if left > p["near_expiry_window_days"]:
+        rows.append(("WARRANTY: ACTIVE", GREEN))
+    elif left >= 0:
+        rows.append(("WARRANTY: EXPIRING SOON", AMBER))
+    elif abs(left) <= p["grace_period_days"]:
+        rows.append(("WARRANTY: GRACE PERIOD", AMBER))
+    else:
+        rows.append(("WARRANTY: EXPIRED", RED))
 
-    lines = [
-        ("Claim Summary Card", True),
-        (f"Claim ID: {row['claim_id']}", False),
-        (f"Product: {row['product_name']} ({row['product_category']})", False),
-        (f"Product Age: {row['product_age_days']} days", False),
-        (f"Purchase Date: {format_date(row['purchase_date'], date_fmt)}", False),
-        (f"Warranty Status: {warranty_status} ({warranty_detail})", False),
-        (f"Fault Type: {row['fault_type']}", False),
-        (f"Damage Type: {row['damage_type']}", False),
-        (f"Repair Count: {row['repair_count']}", False),
-        (f"Repair Authorized: {'Yes' if row['repair_authorized'] else 'No'}", False),
-        (f"Serial Number Status: {'Match' if row['serial_number_match'] else 'Mismatch'}", False),
-        (f"Previous Replacement: {'Yes' if row['previous_replacement'] else 'No'}", False),
-    ]
-    for d in doc_status:
-        lines.append((d, False))
+    if r["fault_type"] in p["exclusions"]:
+        rows.append(("FAULT: EXCLUDED", RED))
+    elif r["fault_type"] in p["covered_faults"]:
+        rows.append(("FAULT: COVERED", GREEN))
+    else:
+        rows.append(("FAULT: NOT LISTED", AMBER))
 
-    return lines
+    vague = any(k in str(r["fault_description"]).lower() for k in p["ambiguous_keywords"])
+    rows.append(("DESCRIPTION: VAGUE", AMBER) if vague else ("DESCRIPTION: CLEAR", GREEN))
+
+    rows.append(("SERIAL: MATCH", GREEN) if r["serial_number_match"] else ("SERIAL: MISMATCH", RED))
+    rows.append(("RECEIPT: PRESENT", GREEN) if r["has_receipt"] else ("RECEIPT: MISSING", AMBER))
+    rows.append(("WARRANTY CARD: PRESENT", GREEN) if r["has_warranty_card"] else ("WARRANTY CARD: MISSING", AMBER))
+    rows.append(("PRODUCT IMAGE: PRESENT", GREEN) if r["has_product_image"] else ("PRODUCT IMAGE: MISSING", AMBER))
+
+    if r["repair_count"] == 0:
+        rows.append(("REPAIR: NONE", GREEN))
+    elif r["repair_authorized"]:
+        rows.append(("REPAIR: AUTHORIZED", GREEN))
+    else:
+        rows.append(("REPAIR: UNAUTHORIZED", AMBER))
+
+    rows.append(("REPLACEMENT: USED", RED) if r["previous_replacement"] else ("REPLACEMENT: NONE", GREEN))
+    rows.append(("DUPLICATE: YES", AMBER) if r["is_duplicate_claim"] else ("DUPLICATE: NO", GREEN))
+    return rows
 
 
-def render_card(row: pd.Series, bg_color: str, font_size: int, date_fmt: str,
-                 padding: int) -> Image.Image:
-    img = Image.new("RGB", (CARD_WIDTH, CARD_HEIGHT), color=bg_color)
-    draw = ImageDraw.Draw(img)
-
-    title_font = get_font(font_size + 6)
-    body_font = get_font(font_size)
-
-    lines = build_card_lines(row, date_fmt)
-
-    y = padding
-    line_height = font_size + 10
-
-    for text, is_title in lines:
-        font = title_font if is_title else body_font
-        color = "#1A1A1A" if is_title else "#333333"
-        draw.text((padding, y), text, fill=color, font=font)
-        y += line_height + (10 if is_title else 0)
-
-    # Simple border for visual consistency
-    draw.rectangle([(2, 2), (CARD_WIDTH - 3, CARD_HEIGHT - 3)], outline="#CCCCCC", width=2)
-
+def render(r, bg, margin, corner):
+    img = Image.new("RGB", (W, H), bg)
+    dr = ImageDraw.Draw(img)
+    dr.text((margin, 14), "CLAIM SUMMARY CARD", fill="#1A1A1A", font=font(30))
+    dr.text((margin, 52), f"{r['claim_id']} | {r['product_name']} | {r['product_age_days']} days old",
+            fill="#444444", font=font(17))
+    y = 90
+    for text, color in build_rows(r):
+        dr.rounded_rectangle([(margin, y), (W - margin, y + 54)], radius=corner, fill=color)
+        dr.text((margin + 16, y + 11), text, fill="#FFFFFF" if color != AMBER else "#1A1A1A", font=font(28))
+        y += 62
     return img
 
 
-def generate_cards_for_split(csv_path: str, split_name: str, variations: int):
+def run_split(csv_path, split, variations):
     df = pd.read_csv(csv_path)
-    base_dir = f"data/claim_summary_cards/{split_name}"
-
-    total_images = 0
-    for _, row in df.iterrows():
-        folder = LABEL_TO_FOLDER[row["class_label"]]
-        out_dir = os.path.join(base_dir, folder)
-        os.makedirs(out_dir, exist_ok=True)
-
+    n = 0
+    for _, r in df.iterrows():
+        out = Path(f"data/claim_summary_cards/{split}/{r['class_label']}")
+        out.mkdir(parents=True, exist_ok=True)
         for v in range(variations):
-            bg_color = random.choice(BACKGROUND_COLORS)
-            font_size = random.choice(FONT_SIZES)
-            date_fmt = random.choice(DATE_FORMATS)
-            padding = random.choice([20, 30])
-
-            img = render_card(row, bg_color, font_size, date_fmt, padding)
-            filename = f"{row['claim_id']}_v{v+1}.png"
-            img.save(os.path.join(out_dir, filename))
-            total_images += 1
-
-    print(f"{split_name}: generated {total_images} images from {len(df)} claims "
-          f"({variations} variation(s) each)")
-
-
-def main():
-    print("Generating Claim Summary Card images...")
-
-    # Training: >=2 variations per claim (SRS requirement)
-    generate_cards_for_split("data/processed/train.csv", "train", variations=2)
-
-    # Validation and Testing: exactly 1 image each, no variations, no training use
-    generate_cards_for_split("data/processed/val.csv", "val", variations=1)
-    generate_cards_for_split("data/processed/test.csv", "test", variations=1)
-
-    print("\nDone. Card images saved under data/claim_summary_cards/")
+            img = render(r, random.choice(BACKGROUNDS), random.choice([16, 24]), random.choice([6, 14]))
+            img.save(out / f"{r['claim_id']}_v{v + 1}.png")
+            n += 1
+    print(f"{split}: {n} images from {len(df)} claims")
 
 
 if __name__ == "__main__":
-    main()
+    run_split("data/processed/train.csv", "train", 2)
+    run_split("data/processed/val.csv", "val", 1)
+    run_split("data/processed/test.csv", "test", 1)
