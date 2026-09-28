@@ -8,6 +8,7 @@ import streamlit as st
 from src.auth import require_login
 from src.db.db_utils import claim_overview, query, log_action
 
+
 st.set_page_config(page_title="Reports", page_icon="📄", layout="wide")
 user = require_login()
 st.title("Search, Reports and Export")

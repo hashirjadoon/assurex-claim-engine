@@ -1,0 +1,110 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.6.0 -- /home/hashirkhan/Downloads/assurex-claim-engine/venv/bin/python3.12
+cachedir: .pytest_cache
+rootdir: /home/hashirkhan/Downloads/assurex-claim-engine
+plugins: Faker-30.3.0
+collecting ... collected 63 items
+
+tests/test_decision_logic.py::test_strong_match PASSED                   [  1%]
+tests/test_decision_logic.py::test_acceptable_match PASSED               [  3%]
+tests/test_decision_logic.py::test_weak_match PASSED                     [  4%]
+tests/test_decision_logic.py::test_uncertain_low_confidence PASSED       [  6%]
+tests/test_decision_logic.py::test_model_disagreement PASSED             [  7%]
+tests/test_decision_logic.py::test_confidence_difference_formula PASSED  [  9%]
+tests/test_decision_logic.py::test_final_likely_valid PASSED             [ 11%]
+tests/test_decision_logic.py::test_final_likely_invalid_when_rules_and_models_agree PASSED [ 12%]
+tests/test_decision_logic.py::test_hard_fail_not_confirmed_goes_to_manual PASSED [ 14%]
+tests/test_decision_logic.py::test_contradiction_forces_manual PASSED    [ 15%]
+tests/test_decision_logic.py::test_model_disagreement_forces_manual PASSED [ 17%]
+tests/test_decision_logic.py::test_rule_manual_reason_forces_manual PASSED [ 19%]
+tests/test_decision_logic.py::test_low_confidence_forces_manual PASSED   [ 20%]
+tests/test_model_predict.py::test_output_shape_and_probabilities_sum_to_one PASSED [ 22%]
+tests/test_model_predict.py::test_unknown_category_rejected PASSED       [ 23%]
+tests/test_model_predict.py::test_accuracy_meets_srs_threshold PASSED    [ 25%]
+tests/test_rules_engine.py::test_valid_claim_passes PASSED               [ 26%]
+tests/test_rules_engine.py::test_expired_warranty_hard_fail PASSED       [ 28%]
+tests/test_rules_engine.py::test_excluded_fault_hard_fail PASSED         [ 30%]
+tests/test_rules_engine.py::test_missing_documents_manual_review PASSED  [ 31%]
+tests/test_rules_engine.py::test_serial_mismatch_hard_fail_per_policy PASSED [ 33%]
+tests/test_rules_engine.py::test_prior_replacement_hard_fail PASSED      [ 34%]
+tests/test_rules_engine.py::test_unauthorized_repair_manual_review PASSED [ 36%]
+tests/test_rules_engine.py::test_duplicate_manual_review PASSED          [ 38%]
+tests/test_rules_engine.py::test_ambiguous_description_manual_review PASSED [ 39%]
+tests/test_rules_engine.py::test_late_reporting_manual_review PASSED     [ 41%]
+tests/test_rules_engine.py::test_boundary_8_days_before_expiry_is_active PASSED [ 42%]
+tests/test_rules_engine.py::test_boundary_7_days_before_expiry_is_manual PASSED [ 44%]
+tests/test_rules_engine.py::test_boundary_expiry_day_is_manual PASSED    [ 46%]
+tests/test_rules_engine.py::test_boundary_grace_day_3_is_manual PASSED   [ 47%]
+tests/test_rules_engine.py::test_boundary_grace_day_4_is_hard_fail PASSED [ 49%]
+tests/test_rules_engine.py::test_no_contradictions_on_clean_claim PASSED [ 50%]
+tests/test_rules_engine.py::test_claim_before_purchase PASSED            [ 52%]
+tests/test_rules_engine.py::test_fault_before_purchase PASSED            [ 53%]
+tests/test_rules_engine.py::test_fault_after_claim PASSED                [ 55%]
+tests/test_rules_engine.py::test_product_age_mismatch PASSED             [ 57%]
+tests/test_rules_engine.py::test_receipt_serial_conflict PASSED          [ 58%]
+tests/test_srs_scenarios.py::test_s01_valid_claim PASSED                 [ 60%]
+tests/test_srs_scenarios.py::test_s02_invalid_claim PASSED               [ 61%]
+tests/test_srs_scenarios.py::test_s03_manual_review_claim PASSED         [ 63%]
+tests/test_srs_scenarios.py::test_s04_expired_warranty PASSED            [ 65%]
+tests/test_srs_scenarios.py::test_s05_missing_document PASSED            [ 66%]
+tests/test_srs_scenarios.py::test_s06_duplicate_claim PASSED             [ 68%]
+tests/test_srs_scenarios.py::test_s07_contradictory_claim PASSED         [ 69%]
+tests/test_srs_scenarios.py::test_s08_serial_number_mismatch PASSED      [ 71%]
+tests/test_srs_scenarios.py::test_s09_unauthorized_repair PASSED         [ 73%]
+tests/test_srs_scenarios.py::test_s10_tricky_boundary_date PASSED        [ 74%]
+tests/test_srs_scenarios.py::test_s11_model_disagreement PASSED          [ 76%]
+tests/test_srs_scenarios.py::test_unknown_category_raises PASSED         [ 77%]
+tests/test_srs_scenarios.py::test_bad_date_format_raises PASSED          [ 79%]
+tests/test_srs_scenarios.py::test_confidence_exactly_at_min_is_not_uncertain PASSED [ 80%]
+tests/test_srs_scenarios.py::test_confidence_just_below_min_is_uncertain PASSED [ 82%]
+tests/test_srs_scenarios.py::test_db_default_users_created PASSED        [ 84%]
+tests/test_srs_scenarios.py::test_db_correct_password_logs_in PASSED     [ 85%]
+tests/test_srs_scenarios.py::test_sec_wrong_password_rejected PASSED     [ 87%]
+tests/test_srs_scenarios.py::test_sec_unknown_user_rejected PASSED       [ 88%]
+tests/test_srs_scenarios.py::test_sec_password_not_stored_plaintext PASSED [ 90%]
+tests/test_srs_scenarios.py::test_sec_unique_salts PASSED                [ 92%]
+tests/test_srs_scenarios.py::test_sec_sql_injection_login_fails PASSED   [ 93%]
+tests/test_srs_scenarios.py::test_db_duplicate_username_rejected PASSED  [ 95%]
+tests/test_srs_scenarios.py::test_db_audit_log_and_notification PASSED   [ 96%]
+tests/test_srs_scenarios.py::test_ocr_rejects_non_image PASSED           [ 98%]
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys PASSED       [100%]
+
+=============================== warnings summary ===============================
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys
+  /home/hashirkhan/Downloads/assurex-claim-engine/venv/lib/python3.12/site-packages/easyocr/detection.py:81: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    torch.quantization.quantize_dynamic(net, dtype=torch.qint8, inplace=True)
+
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys
+  /home/hashirkhan/Downloads/assurex-claim-engine/venv/lib/python3.12/site-packages/torch/ao/quantization/quantize.py:570: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    convert(model, mapping, inplace=True)
+
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys
+  /home/hashirkhan/Downloads/assurex-claim-engine/venv/lib/python3.12/site-packages/easyocr/recognition.py:177: DeprecationWarning: torch.ao.quantization is deprecated and will be removed in 2.10. 
+  For migrations of users: 
+  1. Eager mode quantization (torch.ao.quantization.quantize, torch.ao.quantization.quantize_dynamic), please migrate to use torchao eager mode quantize_ API instead 
+  2. FX graph mode quantization (torch.ao.quantization.quantize_fx.prepare_fx,torch.ao.quantization.quantize_fx.convert_fx, please migrate to use torchao pt2e quantization API instead (prepare_pt2e, convert_pt2e) 
+  3. pt2e quantization has been migrated to torchao (https://github.com/pytorch/ao/tree/main/torchao/quantization/pt2e) 
+  see https://github.com/pytorch/ao/issues/2259 for more details
+    torch.quantization.quantize_dynamic(model, dtype=torch.qint8, inplace=True)
+
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys
+  /home/hashirkhan/Downloads/assurex-claim-engine/venv/lib/python3.12/site-packages/torch/ao/nn/quantized/dynamic/modules/rnn.py:162: UserWarning: torch.quantize_per_tensor, torch.quantize_per_channel and other quantized tensor creation functions that produce tensors with dtype torch.quint8, torch.qint8, and torch.qint32 are deprecated and will be removed in a future PyTorch release. Please see https://github.com/pytorch/pytorch/issues/184982 for more information. (Triggered internally at /__w/pytorch/pytorch/aten/src/ATen/quantized/Quantizer.cpp:111.)
+    w_ih = torch.quantize_per_tensor(
+
+tests/test_srs_scenarios.py::test_ocr_returns_expected_keys
+  /home/hashirkhan/Downloads/assurex-claim-engine/venv/lib/python3.12/site-packages/torch/utils/data/dataloader.py:759: UserWarning: 'pin_memory' argument is set as true but no accelerator is found, then device pinned memory won't be used.
+    super().__init__(loader)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 63 passed, 6 warnings in 6.71s ========================

@@ -2,6 +2,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+
 import streamlit as st
 from src.db.db_utils import init_db, create_user, verify_user, log_action
 

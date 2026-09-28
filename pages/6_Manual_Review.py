@@ -8,6 +8,7 @@ import streamlit as st
 from src.auth import require_login
 from src.db.db_utils import claim_overview, query, execute, log_action, notify
 
+
 st.set_page_config(page_title="Manual Review", page_icon="🔎", layout="wide")
 user = require_login(["reviewer", "admin"])
 st.title("Manual Review Queue")
