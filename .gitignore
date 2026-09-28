@@ -1,10 +1,35 @@
+# Environments
 venv/
 .venv/
+env/
+
+# Python
 __pycache__/
 *.pyc
-database/*.db
-.streamlit/secrets.toml
+*.pyo
+.pytest_cache/
 .ipynb_checkpoints/
+
+# Local database and user uploads
+database/*.db
+database/*.sqlite*
 data/uploads/
+
+# Secrets
+.env
+.streamlit/secrets.toml
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local dumps and scratch files
+context.txt
 project_snapshot.txt
 project_source.txt
+*.log
+# Office lock files
+.~lock.*
+~$*

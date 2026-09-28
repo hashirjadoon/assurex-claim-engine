@@ -15,6 +15,11 @@ from datetime import datetime
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
+
+import sys
+sys.path.insert(0, ".")
+from src.ml.features import add_derived_features
+
 import pandas as pd
 import seaborn as sns
 from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
@@ -38,6 +43,8 @@ test_df = pd.read_csv("data/processed/test.csv")
 
 print(f"Train: {len(train_df)} | Val: {len(val_df)} | Test: {len(test_df)}")
 
+train_df, val_df, test_df = [add_derived_features(d) for d in (train_df, val_df, test_df)]
+
 # %% [markdown]
 # ## 2. Feature selection and encoding
 #
@@ -52,7 +59,7 @@ BOOLEAN_FEATURES = ["has_receipt", "has_warranty_card", "has_product_image",
                      "serial_number_match", "repair_authorized",
                      "previous_replacement", "is_duplicate_claim"]
 NUMERIC_FEATURES = ["product_age_days", "warranty_duration_days", "repair_count",
-                     "purchase_price"]
+                    "purchase_price", "remaining_warranty_days", "missing_doc_count"]
 
 TARGET = "class_label"
 
@@ -258,7 +265,8 @@ print(sample_output.head(10).to_string(index=False))
 # %%
 joblib.dump(best_model, "model/claim_classifier.pkl")
 joblib.dump({"encoders": encoders, "scaler": scaler,
-             "feature_columns": list(X_train.columns)}, "model/encoders.pkl")
+             "feature_columns": list(X_train.columns),
+             "numeric_features": NUMERIC_FEATURES}, "model/encoders.pkl")
 
 metadata = {
     "model_name": best_model_name,

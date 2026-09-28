@@ -4,6 +4,8 @@ from pathlib import Path
 import joblib
 import pandas as pd
 
+from src.ml.features import add_derived_features
+
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MODEL_PATH = BASE_DIR / "model" / "claim_classifier.pkl"
 ENC_PATH = BASE_DIR / "model" / "encoders.pkl"
@@ -14,7 +16,7 @@ BOOLEAN = ["has_receipt", "has_warranty_card", "has_product_image",
            "serial_number_match", "repair_authorized",
            "previous_replacement", "is_duplicate_claim"]
 NUMERIC = ["product_age_days", "warranty_duration_days", "repair_count",
-           "purchase_price"]
+           "purchase_price", "remaining_warranty_days", "missing_doc_count"]
 
 _model = None
 _bundle = None
@@ -40,7 +42,7 @@ def predict_claim(claim: dict) -> dict:
     """Independent Python-model prediction. Never receives GTM output."""
     _load()
     enc = _bundle["encoders"]
-    row = pd.DataFrame([claim])
+    row = add_derived_features(pd.DataFrame([claim]))
 
     for col in CATEGORICAL:
         if claim[col] not in enc[col].classes_:
@@ -49,7 +51,7 @@ def predict_claim(claim: dict) -> dict:
     for col in BOOLEAN:
         row[col] = row[col].astype(int)
 
-    row = row[_bundle["feature_columns"]]
+    row = row[_bundle["feature_columns"]].copy()
     row[NUMERIC] = _bundle["scaler"].transform(row[NUMERIC])
 
     probs = _model.predict_proba(row)[0]

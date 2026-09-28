@@ -1,16 +1,16 @@
 {
   "model_name": "GradientBoosting",
   "model_version": "1.0.0",
-  "trained_at": "2026-09-25T14:15:56.018457",
+  "trained_at": "2026-09-28T20:10:28.994965",
   "best_params": {
     "learning_rate": 0.1,
-    "n_estimators": 150
+    "n_estimators": 100
   },
-  "test_accuracy": 0.9244444444444444,
-  "test_f1_macro": 0.9238119820308572,
-  "val_accuracy": 0.9155555555555556,
-  "val_f1_macro": 0.9151964085297419,
-  "cv_f1_macro_mean": 0.9143061571297688,
+  "test_accuracy": 0.9288888888888889,
+  "test_f1_macro": 0.9282639885222381,
+  "val_accuracy": 0.9111111111111111,
+  "val_f1_macro": 0.9110368364099708,
+  "cv_f1_macro_mean": 0.9227454601271857,
   "classes": [
     "Invalid",
     "ManualReview",
@@ -30,6 +30,8 @@
     "product_age_days",
     "warranty_duration_days",
     "repair_count",
-    "purchase_price"
+    "purchase_price",
+    "remaining_warranty_days",
+    "missing_doc_count"
   ]
 }
