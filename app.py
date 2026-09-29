@@ -19,3 +19,12 @@ if user:
             st.info(f"{n['created_at']}: {n['message']}")
 else:
     st.info("Please log in from the Login page in the sidebar.")
+    st.markdown("""
+    **Demo credentials for evaluators:**
+
+    | Role | Username | Password |
+    |---|---|---|
+    | Administrator | `admin` | `Admin@123` |
+    | Reviewer | `reviewer` | `Review@123` |
+    | Customer | `demo` | `Demo@123` |
+    """)
