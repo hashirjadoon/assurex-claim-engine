@@ -36,6 +36,17 @@ Built for the Aptech TechWiz 7 competition, category **NextWave AI and ML** (the
 
 ---
 
+## 🌐 Live Deployment
+
+The application is deployed and publicly accessible at:
+
+**https://assurex-claim-engine.streamlit.app/**
+
+Demo login credentials:
+- Admin: `admin` / `Admin@123`
+- Reviewer: `reviewer` / `Review@123`
+- Customer: `demo` / `Demo@123`
+
 ## Features
 
 | Area | Capability |
