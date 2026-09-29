@@ -19,7 +19,7 @@ with tab1:
         if user:
             st.session_state["user"] = user
             log_action(user["user_id"], "login", "user", str(user["user_id"]))
-            st.success(f"Logged in as {user['username']} ({user['role']})")
+            st.switch_page("app.py")
         else:
             log_action(None, "failed_login", "user", u)
             st.error("Invalid username or password")
